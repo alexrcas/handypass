@@ -27,7 +27,7 @@
   <div class="card mb-4" v-for="(entry, index) in searchResult">
   <div class="card-header py-0 pt-1 bg-dark d-flex justify-content-between align-items-baseline">
       <h5 class="text-light">{{entry.name}}</h5>
-    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer pe-4 text-light"></i>
+    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
   </div>
 
   <div class="card-body">
@@ -89,7 +89,7 @@
 <div class="card mb-4" v-for="(entry, index) in entries">
   <div class="card-header py-0 pt-1 bg-dark d-flex justify-content-between align-items-baseline">
       <h5 class="text-light">{{entry.name}}</h5>
-    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer pe-4 text-light"></i>
+    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
   </div>
 
   <div class="card-body">
