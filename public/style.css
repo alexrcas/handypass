@@ -1,0 +1,43 @@
+html, body {
+    background: white;
+  }
+
+  input[disabled] {
+    background-color: white !important;
+  }
+  
+  .required {
+    background-color: #F8F6CB;
+  }
+  
+  .cursor-pointer:hover {
+    cursor: pointer;
+  }
+  
+  #editIcon {
+    font-size: 1.3em;
+  }
+  
+  .input-group > *:hover {
+    background-color: #bdc2c7;
+    cursor: pointer;
+  }
+  
+  .accordion-button:not(.collapsed) {
+      color: #0c63e4;
+      background-color: white;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+      border: none;
+  }
+  
+  .accordion-button {
+    border: none;
+  }
+  
+  #angle-rotator {
+    transition: all 0.5s ease;
+  }
+  .rtoate180 {
+    transform: rotate(180deg);
+  }
+  
