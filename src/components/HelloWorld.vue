@@ -66,13 +66,13 @@
     <div class="row mt-3" v-if="entry.observaciones">
       <div>
         <span data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="false" aria-controls="collapseExample">
-          <span class="text-secondary cursor-pointer">
+          <span class="cursor-pointer">
             <i class="fa-solid fa-circle-info me-1"></i>
             Observaciones
           </span>
         </span>
         <div class="collapse mt-2" :id='"collapse" + index'>
-          <div class="card card-body text-secondary">
+          <div class="card card-body">
             {{entry.observaciones}}
           </div>
         </div>
