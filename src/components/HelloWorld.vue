@@ -1,61 +1,170 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank" rel="noopener">typescript</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+
+
+<div class="container-fluid mt-4">
+
+<div class="row mb-4">
+  <div>
+    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Nueva entrada
+    </button>
   </div>
+</div>
+
+<div class="card mb-4" v-for="(entry, index) in entries">
+  <div class="card-header py-0 pt-1 bg-dark d-flex justify-content-between align-items-baseline">
+      <h5 class="text-light">{{entry.name}}</h5>
+    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer pe-4 text-light"></i>
+  </div>
+
+  <div class="card-body">
+
+    <div class="row">
+
+      <div class="col-sm-6 row" v-if="entry.username">
+        <label class="col-sm-4 col-form-label col-form-label-sm">Usuario</label>
+        <div class="col-sm-8">
+          <div class="input-group">
+            <input type="email" class="form-control form-control-sm" disabled="true" :value="entry.username">
+            <div class="input-group-text">
+              <i class="fa-regular fa-clipboard"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <label class="col-sm-2 col-form-label col-form-label-sm">Password</label>
+      <div class="col-sm-4">
+        <div class="input-group">
+          <input type="password" class="form-control form-control-sm" disabled="true" :value="entry.password">
+          <div class="input-group-text">
+            <i class="fa-regular fa-clipboard"></i>
+          </div>
+          <div class="input-group-text">
+            <i class="fa-sharp fa-solid fa-eye"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row mt-3" v-if="entry.observaciones">
+      <div>
+        <span data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="false" aria-controls="collapseExample">
+          <span class="text-secondary cursor-pointer">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            Observaciones
+          </span>
+        </span>
+        <div class="collapse mt-2" :id='"collapse" + index'>
+          <div class="card card-body text-secondary">
+            {{entry.observaciones}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Nueva entrada</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+                  <div class="row mb-3">
+          <div class="col-sm-12">
+            <input type="email" v-model="newEntry.newEntryName" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-sm-12">
+            <input type="email" v-model="newEntry.newEntryUsername" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-12">
+            <div class="input-group">
+              <input type="password" v-model="newEntry.newEntryPassword" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Password">
+              <div class="input-group-text">
+<i class="fa-solid fa-dice"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-sm-12">
+            <textarea class="form-control form-control-sm" v-model="newEntry.newEntryDetails" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click=createNewEntry() :disabled="isDisabled()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Vue } from 'vue-class-component';
 
-@Options({
-  props: {
-    msg: String
-  }
-})
+
 export default class HelloWorld extends Vue {
-  msg!: string
+
+  newEntry: {
+    newEntryName: string,
+    newEntryUsername: string,
+    newEntryPassword: string,
+    newEntryDetails: string,
+  } = {
+    newEntryName: '',
+    newEntryUsername: '',
+    newEntryPassword: '',
+    newEntryDetails: ''
+  } 
+
+  entries: any[] = [];
+
+
+  createNewEntry = () => {
+  
+    this.entries.push({
+        'name': this.newEntry.newEntryName,
+        'username': this.newEntry.newEntryUsername,
+        'password': this.newEntry.newEntryPassword,
+        'observaciones': this.newEntry.newEntryDetails,
+        'visible': false
+      });
+
+      this.newEntry.newEntryName = '';
+      this.newEntry.newEntryUsername = '';
+      this.newEntry.newEntryPassword = '';
+      this.newEntry.newEntryDetails = '';
+  }
+
+  isDisabled = () => {
+    if (this.newEntry.newEntryPassword == '') { return true; }
+      if (this.newEntry.newEntryName == '') { return true; }
+      return false;
+  }
+
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
