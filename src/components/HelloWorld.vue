@@ -89,7 +89,7 @@
 <div class="card mb-4" v-for="(entry, index) in entries">
   <div class="card-header py-0 pt-1 bg-secondary d-flex justify-content-between align-items-baseline">
       <h5 class="text-light">{{entry.name}}</h5>
-    <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
+    <i id="editIcon" data-bs-toggle="modal" data-bs-target="#editModal" @click="fillData(entry.uuid)" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
   </div>
 
   <div class="card-body">
@@ -195,6 +195,62 @@
   </div>
 </div>
 
+
+
+
+
+<!-- Modal Editar -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModal">Editar entrada</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+                  <div class="row mb-3">
+          <div class="col-sm-12">
+            <input type="email" v-model="editEntry.editEntryName" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-sm-12">
+            <input type="email" v-model="editEntry.editEntryUsername" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-12">
+            <div class="input-group">
+              <input type="password" v-model="editEntry.editEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
+              <div class="input-group-text">
+                <i class="fa-solid fa-dice"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-sm-12">
+            <textarea v-model="editEntry.editEntryDetails" class="form-control form-control-sm" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="update()" :disabled="isDisabledEdit()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 </div>
 
 
@@ -219,6 +275,21 @@ export default class HelloWorld extends Vue {
     newEntryDetails: ''
   } 
 
+  editEntry: {
+    editEntryName: string,
+    editEntryUsername: string,
+    editEntryPassword: string,
+    editEntryDetails: string,
+    editEntryUuid: number
+  } = {
+    editEntryName: '',
+    editEntryUsername: '',
+    editEntryPassword: '',
+    editEntryDetails: '',
+    editEntryUuid: -1
+  } 
+
+
   searchText: string = '';
 
   entries: any[] = [];
@@ -232,7 +303,8 @@ export default class HelloWorld extends Vue {
         'username': this.newEntry.newEntryUsername,
         'password': this.newEntry.newEntryPassword,
         'observaciones': this.newEntry.newEntryDetails,
-        'visible': false
+        'visible': false,
+        'uuid': Date.now()
       });
 
       this.newEntry.newEntryName = '';
@@ -244,6 +316,11 @@ export default class HelloWorld extends Vue {
 
   isDisabled = () => {
     if (this.newEntry.newEntryName == '') { return true; }
+    return false;
+  }
+
+  isDisabledEdit = () => {
+    if (this.editEntry.editEntryName == '') { return true; }
     return false;
   }
 
@@ -261,6 +338,27 @@ export default class HelloWorld extends Vue {
 
     this.searchResult = this.entries
       .filter(entry => entry.name.toLowerCase().includes(this.searchText));
+  }
+
+  fillData(uuid: number) {
+    const el: any = this.entries
+      .filter(entry => entry.uuid === uuid)[0];
+
+    this.editEntry.editEntryUuid = el.uuid;
+    this.editEntry.editEntryName = el.name;
+    this.editEntry.editEntryUsername = el.username;
+    this.editEntry.editEntryPassword = el.password;
+    this.editEntry.editEntryDetails = el.observaciones;
+  }
+
+  update() {
+    const el: any = this.entries
+      .filter(entry => entry.uuid === this.editEntry.editEntryUuid)[0];
+
+    el.name = this.editEntry.editEntryName;
+    el.username = this.editEntry.editEntryUsername;
+    el.password = this.editEntry.editEntryPassword;
+    el.observaciones = this.editEntry.editEntryDetails;
   }
 
 }
