@@ -22,6 +22,10 @@ html, body {
     background-color: #bdc2c7;
     cursor: pointer;
   }
+
+  .active {
+    background-color: #bdc2c7;
+  }
   
   .accordion-button:not(.collapsed) {
       color: #0c63e4;
