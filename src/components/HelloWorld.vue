@@ -239,10 +239,18 @@
 
       </div>
 
-      <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
+      <div class="d-flex">
+        <div class="mt-1 w-100">
+          <button type="button" class="btn btn-danger ms-3" data-bs-dismiss="modal" @click="deleteEntry()">Eliminar</button>
+        </div>
+        <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="update()" :disabled="isDisabledEdit()">Aceptar</button>
+        </div>
       </div>
+
+
+
     </div>
   </div>
 </div>
@@ -314,12 +322,14 @@ export default class HelloWorld extends Vue {
   }
 
 
-  isDisabled = () => {
+  isDisabled = (): boolean => {
     if (this.newEntry.newEntryName == '') { return true; }
     return false;
   }
 
-  isDisabledEdit = () => {
+
+
+  isDisabledEdit = (): boolean => {
     if (this.editEntry.editEntryName == '') { return true; }
     return false;
   }
@@ -359,6 +369,12 @@ export default class HelloWorld extends Vue {
     el.username = this.editEntry.editEntryUsername;
     el.password = this.editEntry.editEntryPassword;
     el.observaciones = this.editEntry.editEntryDetails;
+  }
+
+  deleteEntry() {
+    this.entries = this.entries
+      .filter(entry => entry.uuid != this.editEntry.editEntryUuid);
+      
   }
 
 }
