@@ -27,7 +27,7 @@
   <template v-if="searchText">
   <div class="card mb-4" v-for="(entry, index) in searchResult">
   <div class="card-header py-0 pt-1 bg-secondary d-flex justify-content-between align-items-baseline">
-      <h5 class="text-light">{{entry.name}}</h5>
+      <h5 class="text-light">{{entry.getName()}}</h5>
     <i id="editIcon" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
   </div>
 
@@ -35,11 +35,11 @@
 
     <div class="row">
 
-      <div class="col-sm-6 row" v-if="entry.username">
+      <div class="col-sm-6 row" v-if="entry.getUsername()">
         <label class="col-sm-4 col-form-label col-form-label-sm">Usuario</label>
         <div class="col-sm-8">
           <div class="input-group">
-            <input type="email" class="form-control form-control-sm" disabled="true" :value="entry.username">
+            <input type="email" class="form-control form-control-sm" disabled="true" :value="entry.getUsername()">
             <div class="input-group-text">
               <i class="fa-regular fa-clipboard"></i>
             </div>
@@ -47,15 +47,15 @@
         </div>
       </div>
 
-      <div class="col-sm-6 row" v-if="entry.password">
+      <div class="col-sm-6 row" v-if="entry.getPassword()">
       <label class="col-sm-4 col-form-label col-form-label-sm">Password</label>
       <div class="col-sm-8">
         <div class="input-group">
-          <input :type="entry.visible ? 'text' : 'password'" class="form-control form-control-sm" disabled="true" :value="entry.password">
+          <input :type="entry.getVisible() ? 'text' : 'password'" class="form-control form-control-sm" disabled="true" :value="entry.getPassword()">
           <div class="input-group-text">
             <i class="fa-regular fa-clipboard"></i>
           </div>
-          <div class="input-group-text" :class="entry.visible ? 'active' : ''" @click="toggleVisible(entry)">
+          <div class="input-group-text" :class="entry.getVisible() ? 'active' : ''" @click="toggleVisible(entry)">
             <i class="fa-sharp fa-solid fa-eye"></i>
           </div>
         </div>
@@ -64,7 +64,7 @@
 
     </div>
 
-    <div class="row mt-3" v-if="entry.observaciones">
+    <div class="row mt-3" v-if="entry.getObservaciones()">
       <div>
         <span data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="false" aria-controls="collapseExample">
           <span class="cursor-pointer">
@@ -74,7 +74,7 @@
         </span>
         <div class="collapse mt-2" :id='"collapse" + index'>
           <div class="card card-body">
-            {{entry.observaciones}}
+            {{entry.getObservaciones()}}
           </div>
         </div>
       </div>
@@ -160,23 +160,23 @@
         
                   <div class="row mb-3">
           <div class="col-sm-12">
-            <input type="email" v-model="newEntry.newEntryName" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
+            <input type="email" v-model="newEntryCommand.name" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
           </div>
         </div>
 
         <div class="row mb-3">
           <div class="col-sm-12">
-            <input type="email" v-model="newEntry.newEntryUsername" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
+            <input type="email" v-model="newEntryCommand.username" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-sm-12">
             <div class="input-group">
-              <input :type="newEntry.newEntrypasswordVisible? 'text' : 'password'" v-model="newEntry.newEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
+              <input :type="newEntryCommand.visible? 'text' : 'password'" v-model="newEntryCommand.password" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
               <div class="input-group-text" @click="randomPassword()">
                 <i class="fa-solid fa-dice"></i>
               </div>
-              <div class="input-group-text" :class="newEntry.newEntrypasswordVisible? 'active' : '' " @click="toggleNewEntryVisible()">
+              <div class="input-group-text" :class="newEntryCommand.visible? 'active' : '' " @click="toggleNewEntryVisible()">
             <i class="fa-sharp fa-solid fa-eye"></i>
           </div>
             </div>
@@ -185,7 +185,7 @@
         
         <div class="row">
           <div class="col-sm-12">
-            <textarea class="form-control form-control-sm" v-model="newEntry.newEntryDetails" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
+            <textarea class="form-control form-control-sm" v-model="newEntryCommand.observaciones" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
           </div>
         </div>
 
@@ -276,6 +276,7 @@ import { Options, Vue } from 'vue-class-component';
 import Popper from 'vue3-popper';
 import PasswordGenerator from '../PasswordGenerator';
 import { nextTick } from 'vue';
+import NewEntryCommand from '@/model/NewEntryCommand';
 
 @Options({
   components: {
@@ -287,19 +288,7 @@ export default class HelloWorld extends Vue {
 
   renderComponent: boolean = true;
 
-  newEntry: {
-    newEntryName: string,
-    newEntryUsername: string,
-    newEntryPassword: string,
-    newEntryDetails: string,
-    newEntrypasswordVisible: boolean
-  } = {
-    newEntryName: '',
-    newEntryUsername: '',
-    newEntryPassword: '',
-    newEntryDetails: '',
-    newEntrypasswordVisible: false
-  } 
+  newEntryCommand: NewEntryCommand = new NewEntryCommand('', '', '', '', false);
 
   editEntry: {
     editEntryName: string,
@@ -321,25 +310,22 @@ export default class HelloWorld extends Vue {
   searchText: string = '';
 
   entries: Entry[] = [];
-  searchResult: any[] = [];
+  searchResult: Entry[] = [];
 
 
   createNewEntry = () => {
   
     this.entries.push(
-      new Entry(this.newEntry.newEntryName, this.newEntry.newEntryUsername, this.newEntry.newEntryPassword,
-      this.newEntry.newEntryDetails, this.newEntry.newEntrypasswordVisible)
+      new Entry(this.newEntryCommand.name, this.newEntryCommand.username, this.newEntryCommand.password,
+      this.newEntryCommand.observaciones, this.newEntryCommand.visible)
     );
 
-      this.newEntry.newEntryName = '';
-      this.newEntry.newEntryUsername = '';
-      this.newEntry.newEntryPassword = '';
-      this.newEntry.newEntryDetails = '';
+    this.newEntryCommand = new NewEntryCommand('', '', '', '', false);
   }
 
 
   isDisabled = (): boolean => {
-    if (this.newEntry.newEntryName == '') { return true; }
+    if (this.newEntryCommand.name == '') { return true; }
     return false;
   }
 
@@ -359,8 +345,11 @@ export default class HelloWorld extends Vue {
     this.renderComponent = true;
   }
 
-  toggleNewEntryVisible () {
-    this.newEntry.newEntrypasswordVisible = !this.newEntry.newEntrypasswordVisible;
+  async toggleNewEntryVisible () {
+    this.renderComponent = false;
+    await nextTick();
+    this.newEntryCommand.toggleVisible();
+    this.renderComponent = true;
   }
 
   toggleEditEntryVisible () {
@@ -409,7 +398,7 @@ export default class HelloWorld extends Vue {
   }
 
   randomPassword() {
-    this.newEntry.newEntryPassword = PasswordGenerator.newPassword();
+    this.newEntryCommand.password = PasswordGenerator.newPassword();
   }
 
   editRandomPassword() {
@@ -417,10 +406,7 @@ export default class HelloWorld extends Vue {
   }
 
   closeNewEntry() {
-    this.newEntry.newEntryName = '';
-    this.newEntry.newEntryUsername = '';
-    this.newEntry.newEntryPassword = '';
-    this.newEntry.newEntryDetails = '';
+    this.newEntryCommand = new NewEntryCommand('', '', '', '', false);
   }
 
 }
