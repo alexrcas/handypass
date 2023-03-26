@@ -99,7 +99,6 @@
 </template>
 
 <script lang="ts">
-
 import EntryType from '@/model/EntryType';
 import { Options, Vue } from 'vue-class-component';
 import Popper from 'vue3-popper';
@@ -116,7 +115,7 @@ import EditEntryCommand from '@/model/EditEntryCommand';
     Entry
   },
 })
-export default class HelloWorld extends Vue {
+export default class Panel extends Vue {
 
   newPasswordVisible: boolean = false;
   renderComponent: boolean = true;
@@ -172,7 +171,7 @@ export default class HelloWorld extends Vue {
     this.renderComponent = true;
   }
 
-  randomPassword() {
+  async randomPassword() {
     this.newEntryCommand.password = PasswordGenerator.newPassword();
   }
 

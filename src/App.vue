@@ -1,15 +1,15 @@
 <template>
-  <HelloWorld/>
+  <Panel/>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import HelloWorld from './components/HelloWorld.vue';
+import Panel from './components/Panel.vue';
 
 
 @Options({
   components: {
-    HelloWorld
+    Panel
   },
 })
 export default class App extends Vue {}
