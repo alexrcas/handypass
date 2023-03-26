@@ -192,7 +192,7 @@
       </div>
 
       <div class="mb-2 d-flex justify-content-end pe-3">
-        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal" @click="closeNewEntry()">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click=createNewEntry() :disabled="isDisabled()">Aceptar</button>
       </div>
     </div>
@@ -408,6 +408,13 @@ export default class HelloWorld extends Vue {
 
   editRandomPassword() {
     this.editEntry.editEntryPassword = PasswordGenerator.newPassword();
+  }
+
+  closeNewEntry() {
+    this.newEntry.newEntryName = '';
+    this.newEntry.newEntryUsername = '';
+    this.newEntry.newEntryPassword = '';
+    this.newEntry.newEntryDetails = '';
   }
 
 }
