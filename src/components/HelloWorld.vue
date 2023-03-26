@@ -1,8 +1,9 @@
 <template>
 
-<nav class="navbar navbar-expand bg-primary text-light py-2">
+
+<nav class="navbar navbar-expand bg-primary text-light py-1">
   <div class="container-fluid">
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarSupportedContent">
       <ul class="navbar-nav me-4 mb-2 mb-lg-0">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -13,8 +14,8 @@
           </ul>
         </li>
       </ul>
-      <form class="d-flex w-100" role="search">
-        <input class="form-control me-2" type="search" placeholder="Buscar..." v-model="searchText" @keyup="filter()" aria-label="Search">
+      <form class="d-flex w-75" role="search">
+        <input class="form-control form-control-sm me-2" type="search" placeholder="Buscar..." v-model="searchText" @keyup="filter()" aria-label="Search">
       </form>
     </div>
   </div>
@@ -147,13 +148,13 @@
 
 </template>
 
+
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header py-2 bg-secondary text-light d-flex justify-content-center">
         <h1 class="modal-title fs-5" id="exampleModalLabel">Nueva entrada</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         
@@ -171,10 +172,13 @@
         <div class="row mb-3">
           <div class="col-sm-12">
             <div class="input-group">
-              <input type="password" v-model="newEntry.newEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
-              <div class="input-group-text">
+              <input :type="newEntry.newEntrypasswordVisible? 'text' : 'password'" v-model="newEntry.newEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
+              <div class="input-group-text" @click="randomPassword()">
                 <i class="fa-solid fa-dice"></i>
               </div>
+              <div class="input-group-text" :class="newEntry.newEntrypasswordVisible? 'active' : '' " @click="toggleNewEntryVisible()">
+            <i class="fa-sharp fa-solid fa-eye"></i>
+          </div>
             </div>
           </div>
         </div>
@@ -187,7 +191,7 @@
 
       </div>
 
-      <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
+      <div class="mb-2 d-flex justify-content-end pe-3">
         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click=createNewEntry() :disabled="isDisabled()">Aceptar</button>
       </div>
@@ -203,9 +207,8 @@
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header py-2 bg-secondary text-light d-flex justify-content-center">
         <h1 class="modal-title fs-5" id="editModal">Editar entrada</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         
@@ -223,10 +226,13 @@
         <div class="row mb-3">
           <div class="col-sm-12">
             <div class="input-group">
-              <input type="password" v-model="editEntry.editEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
-              <div class="input-group-text">
+              <input :type="editEntry.editEntrypasswordVisible? 'text' : 'password'" v-model="editEntry.editEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
+              <div class="input-group-text" @click="editRandomPassword()">
                 <i class="fa-solid fa-dice"></i>
               </div>
+              <div class="input-group-text" :class="editEntry.editEntrypasswordVisible? 'active' : '' " @click="toggleEditEntryVisible()">
+            <i class="fa-sharp fa-solid fa-eye"></i>
+          </div>
             </div>
           </div>
         </div>
@@ -240,10 +246,10 @@
       </div>
 
       <div class="d-flex">
-        <div class="mt-1 w-100">
+        <div class="w-100">
           <button type="button" class="btn btn-danger ms-3" data-bs-dismiss="modal" @click="deleteEntry()">Eliminar</button>
         </div>
-        <div class="mt-1 mb-2 d-flex justify-content-end pe-3">
+        <div class="mb-2 d-flex justify-content-end pe-3">
         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="update()" :disabled="isDisabledEdit()">Aceptar</button>
         </div>
@@ -262,25 +268,35 @@
 </div>
 
 
-
-
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component';
+import { Options, Vue } from 'vue-class-component';
+import Popper from 'vue3-popper';
+import PasswordGenerator from '../PasswordGenerator';
 
+@Options({
+  components: {
+    Popper,
+    PasswordGenerator
+  },
+})
 export default class HelloWorld extends Vue {
+
+  
 
   newEntry: {
     newEntryName: string,
     newEntryUsername: string,
     newEntryPassword: string,
     newEntryDetails: string,
+    newEntrypasswordVisible: boolean
   } = {
     newEntryName: '',
     newEntryUsername: '',
     newEntryPassword: '',
-    newEntryDetails: ''
+    newEntryDetails: '',
+    newEntrypasswordVisible: false
   } 
 
   editEntry: {
@@ -288,13 +304,15 @@ export default class HelloWorld extends Vue {
     editEntryUsername: string,
     editEntryPassword: string,
     editEntryDetails: string,
-    editEntryUuid: number
+    editEntryUuid: number,
+    editEntrypasswordVisible: boolean
   } = {
     editEntryName: '',
     editEntryUsername: '',
     editEntryPassword: '',
     editEntryDetails: '',
-    editEntryUuid: -1
+    editEntryUuid: -1,
+    editEntrypasswordVisible: false
   } 
 
 
@@ -339,6 +357,14 @@ export default class HelloWorld extends Vue {
     entry.visible = !entry.visible;
   }
 
+  toggleNewEntryVisible () {
+    this.newEntry.newEntrypasswordVisible = !this.newEntry.newEntrypasswordVisible;
+  }
+
+  toggleEditEntryVisible () {
+    this.editEntry.editEntrypasswordVisible = !this.editEntry.editEntrypasswordVisible;
+  }
+
 
   filter = () => {
     if (this.searchText == '') {
@@ -373,8 +399,15 @@ export default class HelloWorld extends Vue {
 
   deleteEntry() {
     this.entries = this.entries
-      .filter(entry => entry.uuid != this.editEntry.editEntryUuid);
-      
+      .filter(entry => entry.uuid != this.editEntry.editEntryUuid);   
+  }
+
+  randomPassword() {
+    this.newEntry.newEntryPassword = PasswordGenerator.newPassword();
+  }
+
+  editRandomPassword() {
+    this.editEntry.editEntryPassword = PasswordGenerator.newPassword();
   }
 
 }
