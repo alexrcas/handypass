@@ -27,7 +27,7 @@
 
     <template v-if="!searchText" v-for="entry in entries">
       <template v-if="renderComponent">
-        <Entry :entry="entry" @onDeleteEntry="deleteEntry" @onUpdateEntry="update" />
+        <Entry :entry="entry" @onDeleteEntry="deleteEntry" @onUpdateEntry="update" @onRefresh="refresh"/>
       </template>
     </template>
 
@@ -65,12 +65,12 @@
           <div class="row mb-3">
             <div class="col-sm-12">
               <div class="input-group">
-                <input :type="newEntryCommand.visible ? 'text' : 'password'" v-model="newEntryCommand.password"
+                <input :type="newPasswordVisible ? 'text' : 'password'" v-model="newEntryCommand.password"
                   class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
                 <div class="input-group-text" @click="randomPassword()">
                   <i class="fa-solid fa-dice"></i>
                 </div>
-                <div class="input-group-text" :class="newEntryCommand.visible ? 'active' : ''"
+                <div class="input-group-text" :class="newPasswordVisible ? 'active' : ''"
                   @click="toggleNewEntryVisible()">
                   <i class="fa-sharp fa-solid fa-eye"></i>
                 </div>
@@ -118,8 +118,9 @@ import EditEntryCommand from '@/model/EditEntryCommand';
 })
 export default class HelloWorld extends Vue {
 
+  newPasswordVisible: boolean = false;
   renderComponent: boolean = true;
-  newEntryCommand: NewEntryCommand = new NewEntryCommand('', '', '', '', false);
+  newEntryCommand: NewEntryCommand = new NewEntryCommand('', '', '', '');
   searchText: string = '';
   entries: EntryType[] = [];
   searchResult: EntryType[] = [];
@@ -127,9 +128,9 @@ export default class HelloWorld extends Vue {
   createNewEntry = () => {
     this.entries.push(
       new EntryType(this.newEntryCommand.name, this.newEntryCommand.username, this.newEntryCommand.password,
-        this.newEntryCommand.observaciones, this.newEntryCommand.visible)
+        this.newEntryCommand.observaciones, false)
     );
-    this.newEntryCommand = new NewEntryCommand('', '', '', '', false);
+    this.newEntryCommand = new NewEntryCommand('', '', '', '');
   }
 
 
@@ -138,10 +139,8 @@ export default class HelloWorld extends Vue {
     return false;
   }
 
-  async toggleVisible(entry: EntryType) {
-  }
-
   async toggleNewEntryVisible() {
+    this.newPasswordVisible = !this.newPasswordVisible;
   }
 
   filter = () => {
@@ -178,7 +177,13 @@ export default class HelloWorld extends Vue {
   }
 
   closeNewEntry() {
-    this.newEntryCommand = new NewEntryCommand('', '', '', '', false);
+    this.newEntryCommand = new NewEntryCommand('', '', '', '');
+  }
+
+  async refresh() {
+    this.renderComponent = false;
+    await nextTick();
+    this.renderComponent = true;
   }
 
 }

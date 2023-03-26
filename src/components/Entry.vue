@@ -90,13 +90,13 @@
                     <div class="row mb-3">
                         <div class="col-sm-12">
                             <div class="input-group">
-                                <input :type="editEntryCommand.visible ? 'text' : 'password'"
+                                <input :type="editPasswordVisible ? 'text' : 'password'"
                                     v-model="editEntryCommand.password" class="form-control form-control-sm"
                                     id="colFormLabelSm" placeholder="Password">
                                 <div class="input-group-text" @click="editRandomPassword()">
                                     <i class="fa-solid fa-dice"></i>
                                 </div>
-                                <div class="input-group-text" :class="editEntryCommand.visible ? 'active' : ''"
+                                <div class="input-group-text" :class="editPasswordVisible ? 'active' : ''"
                                     @click="toggleEditVisible()">
                                     <i class="fa-sharp fa-solid fa-eye"></i>
                                 </div>
@@ -144,7 +144,7 @@ import { Options, Vue } from 'vue-class-component';
     props: {
         entry: EntryType
     },
-    emits: ['onDeleteEntry', 'onUpdateEntry'],
+    emits: ['onDeleteEntry', 'onUpdateEntry', 'onRefresh'],
     components: {
         PasswordGenerator
     }
@@ -153,20 +153,22 @@ export default class Entry extends Vue {
 
     entry!: EntryType;
     renderComponent: boolean = true;
-    editEntryCommand: EditEntryCommand = new EditEntryCommand('', '', '', '', false, -1);
+    editEntryCommand: EditEntryCommand = new EditEntryCommand('', '', '', '', -1);
+    editPasswordVisible: boolean = false;
 
     fillData() {
         this.editEntryCommand = new EditEntryCommand(this.entry.getName(), this.entry.getUsername(),
             this.entry.getPassword(), this.entry.getObservaciones(),
-            false, this.entry.getUuid())
+            this.entry.getUuid())
     }
 
     async toggleVisible() {
-
+        this.entry.toggleVisible();
+        this.$emit('onRefresh')
     }
 
     toggleEditVisible() {
-        this.editEntryCommand.toggleVisible();
+        this.editPasswordVisible = !this.editPasswordVisible;
     }
 
     editRandomPassword() {
