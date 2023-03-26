@@ -87,21 +87,21 @@
 
 
 <template v-if="!searchText">
-<div class="card mb-4" v-for="(entry, index) in entries">
+<div class="card mb-4" v-for="(entry, index) in entries" v-if="renderComponent">
   <div class="card-header py-0 pt-1 bg-secondary d-flex justify-content-between align-items-baseline">
-      <h5 class="text-light">{{entry.name}}</h5>
-    <i id="editIcon" data-bs-toggle="modal" data-bs-target="#editModal" @click="fillData(entry.uuid)" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
+      <h5 class="text-light">{{entry.getName()}}</h5>
+    <i id="editIcon" data-bs-toggle="modal" data-bs-target="#editModal" @click="fillData(entry.getUuid())" class="fa-regular fa-pen-to-square text-secondary cursor-pointer text-light"></i>
   </div>
 
   <div class="card-body">
 
     <div class="row">
 
-      <div class="col-sm-6 row" v-if="entry.username">
+      <div class="col-sm-6 row" v-if="entry.getUsername()">
         <label class="col-sm-4 col-form-label col-form-label-sm">Usuario</label>
         <div class="col-sm-8">
           <div class="input-group">
-            <input type="email" class="form-control form-control-sm" disabled="true" :value="entry.username">
+            <input type="email" class="form-control form-control-sm" disabled="true" :value="entry.getUsername()">
             <div class="input-group-text">
               <i class="fa-regular fa-clipboard"></i>
             </div>
@@ -109,15 +109,15 @@
         </div>
       </div>
 
-      <div class="col-sm-6 row" v-if="entry.password">
+      <div class="col-sm-6 row" v-if="entry.getPassword()">
       <label class="col-sm-4 col-form-label col-form-label-sm">Password</label>
       <div class="col-sm-8">
         <div class="input-group">
-          <input :type="entry.visible ? 'text' : 'password'" class="form-control form-control-sm" disabled="true" :value="entry.password">
+          <input :type="entry.getVisible() ? 'text' : 'password'" class="form-control form-control-sm" disabled="true" :value="entry.getPassword()">
           <div class="input-group-text">
             <i class="fa-regular fa-clipboard"></i>
           </div>
-          <div class="input-group-text" :class="entry.visible ? 'active' : ''" @click="toggleVisible(entry)">
+          <div class="input-group-text" :class="entry.getVisible() ? 'active' : ''" @click="toggleVisible(entry)">
             <i class="fa-sharp fa-solid fa-eye"></i>
           </div>
         </div>
@@ -126,7 +126,7 @@
 
     </div>
 
-    <div class="row mt-3" v-if="entry.observaciones">
+    <div class="row mt-3" v-if="entry.getObservaciones()">
       <div>
         <span data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="false" aria-controls="collapseExample">
           <span class="cursor-pointer">
@@ -136,7 +136,7 @@
         </span>
         <div class="collapse mt-2" :id='"collapse" + index'>
           <div class="card card-body">
-            {{entry.observaciones}}
+            {{entry.getObservaciones()}}
           </div>
         </div>
       </div>
@@ -271,9 +271,11 @@
 </template>
 
 <script lang="ts">
+import Entry from '@/model/Entry';
 import { Options, Vue } from 'vue-class-component';
 import Popper from 'vue3-popper';
 import PasswordGenerator from '../PasswordGenerator';
+import { nextTick } from 'vue';
 
 @Options({
   components: {
@@ -283,7 +285,7 @@ import PasswordGenerator from '../PasswordGenerator';
 })
 export default class HelloWorld extends Vue {
 
-  
+  renderComponent: boolean = true;
 
   newEntry: {
     newEntryName: string,
@@ -318,20 +320,16 @@ export default class HelloWorld extends Vue {
 
   searchText: string = '';
 
-  entries: any[] = [];
+  entries: Entry[] = [];
   searchResult: any[] = [];
 
 
   createNewEntry = () => {
   
-    this.entries.push({
-        'name': this.newEntry.newEntryName,
-        'username': this.newEntry.newEntryUsername,
-        'password': this.newEntry.newEntryPassword,
-        'observaciones': this.newEntry.newEntryDetails,
-        'visible': false,
-        'uuid': Date.now()
-      });
+    this.entries.push(
+      new Entry(this.newEntry.newEntryName, this.newEntry.newEntryUsername, this.newEntry.newEntryPassword,
+      this.newEntry.newEntryDetails, this.newEntry.newEntrypasswordVisible)
+    );
 
       this.newEntry.newEntryName = '';
       this.newEntry.newEntryUsername = '';
@@ -353,8 +351,12 @@ export default class HelloWorld extends Vue {
   }
 
 
-  toggleVisible (entry: any) {
-    entry.visible = !entry.visible;
+  async toggleVisible(entry: Entry) {
+
+    entry.toggleVisible();
+    this.renderComponent = false;
+    await nextTick();
+    this.renderComponent = true;
   }
 
   toggleNewEntryVisible () {
@@ -373,33 +375,37 @@ export default class HelloWorld extends Vue {
     }
 
     this.searchResult = this.entries
-      .filter(entry => entry.name.toLowerCase().includes(this.searchText));
+      .filter(entry => entry.getName().toLowerCase().includes(this.searchText));
   }
 
   fillData(uuid: number) {
-    const el: any = this.entries
-      .filter(entry => entry.uuid === uuid)[0];
+    const entry = this.entries
+      .filter(entry => entry.getUuid() === uuid)[0];
 
-    this.editEntry.editEntryUuid = el.uuid;
-    this.editEntry.editEntryName = el.name;
-    this.editEntry.editEntryUsername = el.username;
-    this.editEntry.editEntryPassword = el.password;
-    this.editEntry.editEntryDetails = el.observaciones;
+    this.editEntry.editEntryUuid = entry.getUuid();
+    this.editEntry.editEntryName = entry.getName();
+    this.editEntry.editEntryUsername = entry.getUsername();
+    this.editEntry.editEntryPassword = entry.getPassword();
+    this.editEntry.editEntryDetails = entry.getObservaciones();
   }
 
-  update() {
-    const el: any = this.entries
-      .filter(entry => entry.uuid === this.editEntry.editEntryUuid)[0];
+  async update() {
+    const entry = this.entries
+      .filter(entry => entry.getUuid() === this.editEntry.editEntryUuid)[0];
 
-    el.name = this.editEntry.editEntryName;
-    el.username = this.editEntry.editEntryUsername;
-    el.password = this.editEntry.editEntryPassword;
-    el.observaciones = this.editEntry.editEntryDetails;
+      entry.setName(this.editEntry.editEntryName)
+      entry.setUsername(this.editEntry.editEntryUsername)
+      entry.setPassword(this.editEntry.editEntryPassword)
+      entry.setObservaciones(this.editEntry.editEntryDetails)
+
+      this.renderComponent = false;
+      await nextTick();
+      this.renderComponent = true;
   }
 
   deleteEntry() {
     this.entries = this.entries
-      .filter(entry => entry.uuid != this.editEntry.editEntryUuid);   
+      .filter(entry => entry.getUuid() != this.editEntry.editEntryUuid);   
   }
 
   randomPassword() {
