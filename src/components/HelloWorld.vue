@@ -214,23 +214,23 @@
         
                   <div class="row mb-3">
           <div class="col-sm-12">
-            <input type="email" v-model="editEntry.editEntryName" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
+            <input type="email" v-model="editEntryCommand.name" class="form-control form-control-sm required" id="colFormLabelSm" placeholder="Nombre">
           </div>
         </div>
 
         <div class="row mb-3">
           <div class="col-sm-12">
-            <input type="email" v-model="editEntry.editEntryUsername" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
+            <input type="email" v-model="editEntryCommand.username" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Usuario">
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-sm-12">
             <div class="input-group">
-              <input :type="editEntry.editEntrypasswordVisible? 'text' : 'password'" v-model="editEntry.editEntryPassword" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
+              <input :type="editEntryCommand.visible? 'text' : 'password'" v-model="editEntryCommand.password" class="form-control form-control-sm" id="colFormLabelSm" placeholder="Password">
               <div class="input-group-text" @click="editRandomPassword()">
                 <i class="fa-solid fa-dice"></i>
               </div>
-              <div class="input-group-text" :class="editEntry.editEntrypasswordVisible? 'active' : '' " @click="toggleEditEntryVisible()">
+              <div class="input-group-text" :class="editEntryCommand.visible? 'active' : '' " @click="toggleEditEntryVisible()">
             <i class="fa-sharp fa-solid fa-eye"></i>
           </div>
             </div>
@@ -239,7 +239,7 @@
         
         <div class="row">
           <div class="col-sm-12">
-            <textarea v-model="editEntry.editEntryDetails" class="form-control form-control-sm" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
+            <textarea v-model="editEntryCommand.observaciones" class="form-control form-control-sm" id="exampleFormControlTextarea1" rows="4" placeholder="Observaciones"></textarea>
           </div>
         </div>
 
@@ -277,6 +277,7 @@ import Popper from 'vue3-popper';
 import PasswordGenerator from '../PasswordGenerator';
 import { nextTick } from 'vue';
 import NewEntryCommand from '@/model/NewEntryCommand';
+import EditEntryCommand from '@/model/EditEntryCommand';
 
 @Options({
   components: {
@@ -290,22 +291,7 @@ export default class HelloWorld extends Vue {
 
   newEntryCommand: NewEntryCommand = new NewEntryCommand('', '', '', '', false);
 
-  editEntry: {
-    editEntryName: string,
-    editEntryUsername: string,
-    editEntryPassword: string,
-    editEntryDetails: string,
-    editEntryUuid: number,
-    editEntrypasswordVisible: boolean
-  } = {
-    editEntryName: '',
-    editEntryUsername: '',
-    editEntryPassword: '',
-    editEntryDetails: '',
-    editEntryUuid: -1,
-    editEntrypasswordVisible: false
-  } 
-
+  editEntryCommand: EditEntryCommand = new EditEntryCommand('', '', '', '', false, -1);
 
   searchText: string = '';
 
@@ -329,10 +315,8 @@ export default class HelloWorld extends Vue {
     return false;
   }
 
-
-
   isDisabledEdit = (): boolean => {
-    if (this.editEntry.editEntryName == '') { return true; }
+    if (this.editEntryCommand.name == '') { return true; }
     return false;
   }
 
@@ -352,8 +336,11 @@ export default class HelloWorld extends Vue {
     this.renderComponent = true;
   }
 
-  toggleEditEntryVisible () {
-    this.editEntry.editEntrypasswordVisible = !this.editEntry.editEntrypasswordVisible;
+  async toggleEditEntryVisible () {
+    this.renderComponent = false;
+    this.editEntryCommand.toggleVisible();
+    await nextTick();
+    this.renderComponent = true;
   }
 
 
@@ -371,21 +358,18 @@ export default class HelloWorld extends Vue {
     const entry = this.entries
       .filter(entry => entry.getUuid() === uuid)[0];
 
-    this.editEntry.editEntryUuid = entry.getUuid();
-    this.editEntry.editEntryName = entry.getName();
-    this.editEntry.editEntryUsername = entry.getUsername();
-    this.editEntry.editEntryPassword = entry.getPassword();
-    this.editEntry.editEntryDetails = entry.getObservaciones();
+      this.editEntryCommand = new EditEntryCommand(entry.getName(), entry.getUsername(), entry.getPassword(), entry.getObservaciones(),
+      false, entry.getUuid())
   }
 
   async update() {
     const entry = this.entries
-      .filter(entry => entry.getUuid() === this.editEntry.editEntryUuid)[0];
+      .filter(entry => entry.getUuid() === this.editEntryCommand.uuid)[0];
 
-      entry.setName(this.editEntry.editEntryName)
-      entry.setUsername(this.editEntry.editEntryUsername)
-      entry.setPassword(this.editEntry.editEntryPassword)
-      entry.setObservaciones(this.editEntry.editEntryDetails)
+      entry.setName(this.editEntryCommand.name)
+      entry.setUsername(this.editEntryCommand.username)
+      entry.setPassword(this.editEntryCommand.password)
+      entry.setObservaciones(this.editEntryCommand.observaciones)
 
       this.renderComponent = false;
       await nextTick();
@@ -394,7 +378,7 @@ export default class HelloWorld extends Vue {
 
   deleteEntry() {
     this.entries = this.entries
-      .filter(entry => entry.getUuid() != this.editEntry.editEntryUuid);   
+      .filter(entry => entry.getUuid() != this.editEntryCommand.uuid);   
   }
 
   randomPassword() {
@@ -402,7 +386,7 @@ export default class HelloWorld extends Vue {
   }
 
   editRandomPassword() {
-    this.editEntry.editEntryPassword = PasswordGenerator.newPassword();
+    this.editEntryCommand.password = PasswordGenerator.newPassword();
   }
 
   closeNewEntry() {
