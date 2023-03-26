@@ -1,4 +1,4 @@
-export default class Entry {
+export default class EntryType {
 
     private name: string;
     private username: string;
