@@ -107,6 +107,7 @@ import { nextTick } from 'vue';
 import NewEntryCommand from '@/model/NewEntryCommand';
 import Entry from './Entry.vue';
 import EditEntryCommand from '@/model/EditEntryCommand';
+import { BrowserWindow, ipcRenderer } from 'electron';
 
 @Options({
   components: {
@@ -139,6 +140,9 @@ export default class Panel extends Vue {
   }
 
   async toggleNewEntryVisible() {
+    const result = await (<any>window).ipcRenderer.invoke('test', 'un dato cualquiera');
+    console.log(result)
+
     this.newPasswordVisible = !this.newPasswordVisible;
   }
 

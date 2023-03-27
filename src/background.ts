@@ -4,6 +4,9 @@ import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs';
+import path from 'path';
+import StorageService from './StorageService';
+import { Entry, Properties } from './model/Properties';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -20,12 +23,18 @@ async function createWindow() {
     height: 600,
     minHeight: 600,
     webPreferences: {
+
+      contextIsolation: false,
       
+      preload: path.join(__dirname, 'preload.js'),
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
+      /*
       nodeIntegration: (process.env
           .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
+      */
+     nodeIntegration: true
     }
   })
 
@@ -84,3 +93,19 @@ if (isDevelopment) {
     })
   }
 }
+
+ipcMain.handle('test', async (e, data) => {
+  const properties: Properties = StorageService.loadProperties();
+
+  const newEntry: Entry = {
+    uuid: -1,
+    name: 'un nombre',
+    username: 'un username',
+    password: 'una password',
+    details: 'unos detalles'
+  };
+
+  properties.entries = [...properties.entries, newEntry]
+
+  StorageService.saveProperties(properties);
+})
