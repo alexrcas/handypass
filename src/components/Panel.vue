@@ -125,11 +125,19 @@ export default class Panel extends Vue {
   entries: EntryType[] = [];
   searchResult: EntryType[] = [];
 
-  createNewEntry = () => {
-    this.entries.push(
-      new EntryType(this.newEntryCommand.name, this.newEntryCommand.username, this.newEntryCommand.password,
-        this.newEntryCommand.observaciones, false)
-    );
+  createNewEntry = async () => {
+    const entry: EntryType = new EntryType(this.newEntryCommand.name, this.newEntryCommand.username, this.newEntryCommand.password,
+        this.newEntryCommand.observaciones, false);
+    this.entries.push(entry);
+
+    const result = await (<any>window).ipcRenderer.invoke('test', {
+      'uuid': entry.getUuid(),
+      'name': entry.getName(),
+      'username': entry.getUsername(),
+      'password': entry.getPassword(),
+      'details': entry.getObservaciones()
+    });
+
     this.newEntryCommand = new NewEntryCommand('', '', '', '');
   }
 
@@ -140,9 +148,6 @@ export default class Panel extends Vue {
   }
 
   async toggleNewEntryVisible() {
-    const result = await (<any>window).ipcRenderer.invoke('test', 'un dato cualquiera');
-    console.log(result)
-
     this.newPasswordVisible = !this.newPasswordVisible;
   }
 
@@ -187,6 +192,13 @@ export default class Panel extends Vue {
     this.renderComponent = false;
     await nextTick();
     this.renderComponent = true;
+  }
+
+  async mounted() {
+    const entries: any[] = await (<any>window).ipcRenderer.invoke('loadEntries', {});
+    
+    this.entries = entries.map(ent => new EntryType(ent.name, ent.username, ent.password, ent.details, false))
+    
   }
 
 }

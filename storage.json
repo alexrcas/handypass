@@ -1,1 +1,19 @@
-{"key":"miclave","entries":[{"uuid":-1,"name":"un nombre","username":"un username","password":"una password","details":"unos detalles"},{"uuid":-1,"name":"un nombre","username":"un username","password":"una password","details":"unos detalles"},{"uuid":-1,"name":"un nombre","username":"un username","password":"una password","details":"unos detalles"},{"uuid":-1,"name":"un nombre","username":"un username","password":"una password","details":"unos detalles"},{"uuid":-1,"name":"un nombre","username":"un username","password":"una password","details":"unos detalles"}]}
+{
+    "key": "miclave",
+    "entries": [
+        {
+            "uuid": 1679953285414,
+            "name": "nombre2",
+            "username": "user",
+            "password": "pass",
+            "details": "observ"
+        },
+        {
+            "uuid": 1679954145514,
+            "name": "otro",
+            "username": "otroname",
+            "password": "otrapass",
+            "details": ""
+        }
+    ]
+}

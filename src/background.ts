@@ -94,18 +94,13 @@ if (isDevelopment) {
   }
 }
 
-ipcMain.handle('test', async (e, data) => {
+ipcMain.handle('test', async (e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
-
-  const newEntry: Entry = {
-    uuid: -1,
-    name: 'un nombre',
-    username: 'un username',
-    password: 'una password',
-    details: 'unos detalles'
-  };
-
-  properties.entries = [...properties.entries, newEntry]
-
+  properties.entries = [...properties.entries, data]
   StorageService.saveProperties(properties);
+})
+
+ipcMain.handle('loadEntries', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  return properties.entries;
 })
