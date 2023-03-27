@@ -8,13 +8,13 @@ export default class EntryType {
     private uuid: number;
 
     constructor(name: string, username: string, password: string,
-        observaciones: string, visible: boolean) {
+        observaciones: string, visible: boolean, uuid?: number) {
             this.name = name;
             this.username = username;
             this.password = password;
             this.observaciones = observaciones;
             this.visible = visible;
-            this.uuid = Date.now();
+            this.uuid = uuid || Date.now();
     }
 
     getName = (): string => {

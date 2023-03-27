@@ -6,7 +6,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs';
 import path from 'path';
 import StorageService from './StorageService';
-import { Entry, Properties } from './model/Properties';
+import { IEntry, Properties } from './model/Properties';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

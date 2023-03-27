@@ -1,4 +1,4 @@
-export interface Entry {
+export interface IEntry {
     uuid: number;
     name: string;
     username: string;
@@ -8,5 +8,5 @@ export interface Entry {
 
 export interface Properties {
     key: string;
-    entries: Entry[];
+    entries: IEntry[];
 }

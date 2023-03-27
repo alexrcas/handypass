@@ -108,6 +108,7 @@ import NewEntryCommand from '@/model/NewEntryCommand';
 import Entry from './Entry.vue';
 import EditEntryCommand from '@/model/EditEntryCommand';
 import { BrowserWindow, ipcRenderer } from 'electron';
+import { IEntry } from '@/model/Properties';
 
 @Options({
   components: {
@@ -195,10 +196,9 @@ export default class Panel extends Vue {
   }
 
   async mounted() {
-    const entries: any[] = await (<any>window).ipcRenderer.invoke('loadEntries', {});
-    
-    this.entries = entries.map(ent => new EntryType(ent.name, ent.username, ent.password, ent.details, false))
-    
+    const entries: IEntry[] = await (<any>window).ipcRenderer.invoke('loadEntries', {});
+    this.entries = entries
+      .map(ent => new EntryType(ent.name, ent.username, ent.password, ent.details, false, ent.uuid));
   }
 
 }
