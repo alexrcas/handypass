@@ -28,6 +28,7 @@ async function createWindow() {
     webPreferences: {
 
       contextIsolation: false,
+      devTools: false,
       
       preload: path.join(__dirname, 'preload.js'),
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -97,6 +98,16 @@ if (isDevelopment) {
   }
 }
 
+ipcMain.handle('loadKey', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  return properties.key;
+})
+
+ipcMain.handle('saveKey', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  properties.key = data;
+  StorageService.saveProperties(properties)
+})
 
 ipcMain.handle('loadEntries', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();

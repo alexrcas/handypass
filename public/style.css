@@ -1,9 +1,14 @@
 html, body {
-    background: white;
+  background: #1A2226;
+  }
+
+  .dark-bg {
+    background: #1A2226;
   }
 
   input[disabled] {
-    background-color: white !important;
+    background-color: #384848 !important;
+    color: white;
   }
   
   .required {
@@ -24,7 +29,7 @@ html, body {
   }
 
   .active {
-    background-color: #bdc2c7;
+    color: #fefefe !important;
   }
   
   .accordion-button:not(.collapsed) {
@@ -44,4 +49,15 @@ html, body {
   .rtoate180 {
     transform: rotate(180deg);
   }
-  
+
+  .input-group-text {
+    background: rgba(0, 0, 0, 0);
+    border: none;
+    color: #609fae;
+  }
+
+  .input-group-text:hover {
+    background: rgba(0, 0, 0, 0);
+    border: none;
+    color: #4c7680;
+  }
