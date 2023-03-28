@@ -129,15 +129,10 @@ export default class Panel extends Vue {
   createNewEntry = async () => {
     const entry: EntryType = new EntryType(this.newEntryCommand.name, this.newEntryCommand.username, this.newEntryCommand.password,
         this.newEntryCommand.observaciones, false);
-    this.entries.push(entry);
+    this.entries.push(entry)
 
-    const result = await (<any>window).ipcRenderer.invoke('test', {
-      'uuid': entry.getUuid(),
-      'name': entry.getName(),
-      'username': entry.getUsername(),
-      'password': entry.getPassword(),
-      'details': entry.getObservaciones()
-    });
+    await (<any>window).ipcRenderer.invoke('updateEntries', JSON.stringify(this.entries));
+    this.loadEntries();
 
     this.newEntryCommand = new NewEntryCommand('', '', '', '');
   }
@@ -162,23 +157,20 @@ export default class Panel extends Vue {
   }
 
   async deleteEntry(uuid: number) {
-    this.renderComponent = false;
     this.entries = this.entries.filter(entry => entry.getUuid() != uuid);
-    await nextTick();
-    this.renderComponent = true;
+    await (<any>window).ipcRenderer.invoke('updateEntries', JSON.stringify(this.entries));
+    this.loadEntries()
   }
 
   async update(command: EditEntryCommand) {
-    this.renderComponent = false;
-
     const entry = this.entries.filter(entry => entry.getUuid() == command.uuid)[0];
     entry.setName(command.name);
     entry.setUsername(command.username)
     entry.setPassword(command.password)
-    entry.setObservaciones(command.observaciones);
+    entry.setDetails(command.observaciones);
 
-    await nextTick();
-    this.renderComponent = true;
+    await (<any>window).ipcRenderer.invoke('updateEntries', JSON.stringify(this.entries));
+    this.loadEntries();
   }
 
   async randomPassword() {
@@ -196,6 +188,10 @@ export default class Panel extends Vue {
   }
 
   async mounted() {
+    this.loadEntries();
+  }
+
+  async loadEntries() {
     const entries: IEntry[] = await (<any>window).ipcRenderer.invoke('loadEntries', {});
     this.entries = entries
       .map(ent => new EntryType(ent.name, ent.username, ent.password, ent.details, false, ent.uuid));

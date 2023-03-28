@@ -42,7 +42,7 @@
 
             </div>
 
-            <div class="row mt-3" v-if="entry.getObservaciones()">
+            <div class="row mt-3" v-if="entry.getDetails()">
                 <div>
                     <span data-bs-toggle="collapse" :data-bs-target="'#collapse' + entry.getUuid()" aria-expanded="false"
                         aria-controls="collapseExample">
@@ -53,7 +53,7 @@
                     </span>
                     <div class="collapse mt-2" :id='"collapse" + entry.getUuid()'>
                         <div class="card card-body">
-                            {{ entry.getObservaciones() }}
+                            {{ entry.getDetails() }}
                         </div>
                     </div>
                 </div>
@@ -158,7 +158,7 @@ export default class Entry extends Vue {
 
     fillData() {
         this.editEntryCommand = new EditEntryCommand(this.entry.getName(), this.entry.getUsername(),
-            this.entry.getPassword(), this.entry.getObservaciones(),
+            this.entry.getPassword(), this.entry.getDetails(),
             this.entry.getUuid())
     }
 

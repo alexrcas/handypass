@@ -3,16 +3,16 @@ export default class EntryType {
     private name: string;
     private username: string;
     private password: string;
-    private observaciones: string;
+    private details: string;
     private visible: boolean;
     private uuid: number;
 
     constructor(name: string, username: string, password: string,
-        observaciones: string, visible: boolean, uuid?: number) {
+        details: string, visible: boolean, uuid?: number) {
             this.name = name;
             this.username = username;
             this.password = password;
-            this.observaciones = observaciones;
+            this.details = details;
             this.visible = visible;
             this.uuid = uuid || Date.now();
     }
@@ -41,12 +41,12 @@ export default class EntryType {
         this.password = password;
     }
 
-    getObservaciones = (): string => {
-        return this.observaciones;
+    getDetails = (): string => {
+        return this.details;
     }
 
-    setObservaciones = (observaciones: string) => {
-        this.observaciones = observaciones;
+    setDetails = (details: string) => {
+        this.details = details;
     }
 
     getVisible = (): boolean => {

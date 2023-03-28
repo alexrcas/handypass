@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import StorageService from './StorageService';
 import { IEntry, Properties } from './model/Properties';
+import EntryType from './model/EntryType';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -14,6 +15,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
+
+StorageService.createPropertiesIfNotExist();
 
 async function createWindow() {
   // Create the browser window.
@@ -94,13 +97,15 @@ if (isDevelopment) {
   }
 }
 
-ipcMain.handle('test', async (e, data: any) => {
-  const properties: Properties = StorageService.loadProperties();
-  properties.entries = [...properties.entries, data]
-  StorageService.saveProperties(properties);
-})
 
 ipcMain.handle('loadEntries', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
   return properties.entries;
 })
+
+ipcMain.handle('updateEntries', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  const entries: IEntry[] = JSON.parse(data);
+  properties.entries = entries;
+  StorageService.saveProperties(properties);
+});
