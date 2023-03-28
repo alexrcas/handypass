@@ -37,10 +37,63 @@
 </template>
 
 
-  <div v-if="signIn">
-    <input type="text" v-model="passwordInput">
-    <button @click="signin()">SignIn</button>
+
+<template v-if="signIn">
+    <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3 col-md-2"></div>
+        <div class="col-lg-6 col-md-8 login-box">
+          <div class="col-lg-12 login-key">
+            <i class="fa fa-key" aria-hidden="true"></i>
+          </div>
+          <div class="col-lg-12 login-title">
+            HandyPass
+          </div>
+
+          <div class="p-4 text-light">
+            <h3>Bienvenido</h3>
+            <div class="text-justify mt-4">
+              Estás accediendo a HandyPass por primera vez. Debes crear una contraseña segura que utilizarás para acceder 
+              a la aplicación.
+            </div>
+
+            <div class="text-justify mt-2">
+              ¡Ojo! HandyPass no dispone de ningún mecanismo de recuperación de contraseña. Si la olvidas 
+              no podrás recuperar la información que hayas almacenado.
+            </div>
+          </div>
+
+          <div class="col-lg-12 login-form">
+            <div class="col-lg-12 login-form">
+                <div class="form-group">
+                  <label class="form-control-label">PASSWORD</label>
+                  <input type="password" class="form-control ps-1" v-model="createPasswordInput" autofocus @keyup.enter="submit()">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-control-label">CONFIRMAR PASSWORD</label>
+                  <input type="password" class="form-control ps-1" v-model="createPasswordConfirmInput" autofocus @keyup.enter="submit()">
+                </div>
+                
+
+                <div class="col-lg-12 loginbttm d-flex justify-content-end mb-3">
+                  <div>
+                    <button class="btn btn-outline-primary" :disabled="passwordMissmatch()" @click="signin()">CREAR CUENTA</button>
+                  </div>
+                </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-2"></div>
+      </div>
+    </div>
   </div>
+</div>
+</template>
+
+
+
+
 </template>
 
 <script lang="ts">
@@ -58,6 +111,8 @@ export default class App extends Vue {
   logIn: boolean = false;
   authenticated: boolean = false;
   passwordInput: string = '';
+  createPasswordInput: string = '';
+  createPasswordConfirmInput: string = ''
 
   async beforeMount() {
     const key: string = await this.loadKey();
@@ -81,12 +136,22 @@ export default class App extends Vue {
   }
 
   async signin() {
-    const key = this.passwordInput;
-    return await (<any>window).ipcRenderer.invoke('saveKey', key);
+    const key = this.createPasswordConfirmInput;
+    await (<any>window).ipcRenderer.invoke('saveKey', key);
+    this.signIn = false;
+    this.authenticated = true;
   }
 
   async submit() {
     await this.login();
+  }
+
+  passwordMissmatch() {
+    if (this.createPasswordInput == '') {
+      return true;
+    }
+
+    return this.createPasswordInput != this.createPasswordConfirmInput;
   }
 
 }
@@ -221,5 +286,9 @@ label {
 
 .loginbttm {
     padding: 0px;
+}
+
+.text-justify {
+  text-align: justify;
 }
 </style>

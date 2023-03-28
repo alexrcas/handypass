@@ -61,3 +61,7 @@ html, body {
     border: none;
     color: #4c7680;
   }
+
+  .text-light {
+    color: rgb(247, 240, 240) !important;
+  }
