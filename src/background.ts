@@ -1,13 +1,12 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, globalShortcut} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs';
 import path from 'path';
 import StorageService from './StorageService';
 import { IEntry, Properties } from './model/Properties';
-import EntryType from './model/EntryType';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -81,6 +80,30 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+
+  const ret = globalShortcut.register('CommandOrControl+X', () => {
+    const secondWindow = new BrowserWindow({
+      width: 250,
+      height: 600,
+      frame: false,
+      opacity: 0.95,
+    });
+
+    const { screen, clipboard } = require('electron');
+
+    const x = screen.getPrimaryDisplay().workAreaSize.width;
+
+    secondWindow.setPosition(x - 250, 0);
+    secondWindow.loadURL('file://' + __dirname + '/floatingPanel/floatingPanel.html');
+
+    clipboard.writeText('myPasswordPastedFromHandyPass')
+
+    setTimeout(() => {
+      secondWindow.close();
+    }, 4000);
+  });
+
+
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -120,3 +143,5 @@ ipcMain.handle('updateEntries', async(e, data: any) => {
   properties.entries = entries;
   StorageService.saveProperties(properties);
 });
+
+
