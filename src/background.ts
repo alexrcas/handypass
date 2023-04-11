@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import StorageService from './StorageService';
 import { IEntry, Properties } from './model/Properties';
+import { devtools } from 'vue';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -70,6 +71,9 @@ app.on('activate', () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+
+let secondWindow: BrowserWindow;
+
 app.on('ready', async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
@@ -81,26 +85,28 @@ app.on('ready', async () => {
   }
   createWindow()
 
-  const ret = globalShortcut.register('CommandOrControl+X', () => {
-    const secondWindow = new BrowserWindow({
+  const ret = globalShortcut.register('CommandOrControl+H', () => {
+
+    secondWindow = new BrowserWindow({
       width: 250,
       height: 600,
       frame: false,
       opacity: 0.95,
+
+      webPreferences: {
+        preload: path.join(__dirname, 'preload.js'),
+        nodeIntegration: true,
+        contextIsolation: false
+      }
     });
 
     const { screen, clipboard } = require('electron');
-
     const x = screen.getPrimaryDisplay().workAreaSize.width;
 
     secondWindow.setPosition(x - 250, 0);
     secondWindow.loadURL('file://' + __dirname + '/floatingPanel/floatingPanel.html');
 
     clipboard.writeText('myPasswordPastedFromHandyPass')
-
-    setTimeout(() => {
-      secondWindow.close();
-    }, 4000);
   });
 
 
@@ -126,16 +132,19 @@ ipcMain.handle('loadKey', async(e, data: any) => {
   return properties.key;
 })
 
+
 ipcMain.handle('saveKey', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
   properties.key = data;
   StorageService.saveProperties(properties)
 })
 
+
 ipcMain.handle('loadEntries', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
   return properties.entries;
 })
+
 
 ipcMain.handle('updateEntries', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
@@ -145,3 +154,19 @@ ipcMain.handle('updateEntries', async(e, data: any) => {
 });
 
 
+ipcMain.handle('data', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  return properties.entries;
+});
+
+
+ipcMain.handle('getPassword', async(e, data: any) => {
+  const properties: Properties = StorageService.loadProperties();
+  const uuid = data.uuid;
+  const entry = properties.entries.filter(entry => entry.uuid == uuid)[0];
+
+  const { clipboard } = require('electron');
+  clipboard.writeText(entry.password);
+
+  secondWindow.close();
+});
