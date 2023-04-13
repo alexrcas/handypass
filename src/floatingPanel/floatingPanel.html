@@ -10904,28 +10904,36 @@ textarea.form-control-lg {
         </div>
 
         <div class="row mt-1 d-flex justify-content-center">
-            <ul class="list-group list-group-numbered">
-                <li class="ms-2 list-group-item d-flex justify-content-between align-items-start bg-dark text-light hover">
-                  <div class="ms-2 me-auto">
-                    <div class="fw-bold text-sm">BBDD PRO AP</div>
-                    <em>oracle</em>
-                  </div>
-                </li>
-                <li class="ms-2 list-group-item d-flex justify-content-between align-items-start bg-dark text-light hover">
-                  <div class="ms-2 me-auto">
-                    <div class="fw-bold text-sm">TOMCAT PRE METRO</div>
-                    <em>root</em>
-                  </div>
-                </li>
-                <li class="ms-2 list-group-item d-flex justify-content-between align-items-start bg-dark text-light hover">
-                  <div class="ms-2 me-auto">
-                    <div class="fw-bold text-sm">Confluence</div>
-                    <em>arodriguez</em>
-                  </div>
-                </li>
-              </ul>
+            <ul class="list-group list-group-numbered" id="list">
+            </ul>
         </div>
     </div>
+
+    <script>
+
+      const getPassword = uuid => {
+        window.ipcRenderer.invoke('getPassword', {uuid: uuid});
+      }
+
+      const fetchData = async () => {
+        const entries = await window.ipcRenderer.invoke('data', {});
+        entries.forEach(item => {
+          document.querySelector('#list').innerHTML += `
+          <li class="ms-2 list-group-item d-flex justify-content-between align-items-start bg-dark text-light hover" onclick="getPassword('${item.uuid}')">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold text-sm">${item.name}</div>
+              <em>${item.username}</em>
+            </div>
+          </li>
+          `
+        })
+
+      }
+
+      fetchData();
+
+
+    </script>
 
     
 </body>

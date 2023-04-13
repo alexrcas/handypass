@@ -11,6 +11,8 @@ import { devtools } from 'vue';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+let isAuthenticated: boolean = false;
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
@@ -87,6 +89,10 @@ app.on('ready', async () => {
 
   const ret = globalShortcut.register('CommandOrControl+H', () => {
 
+    if (!isAuthenticated) {
+      return;
+    }
+
     secondWindow = new BrowserWindow({
       width: 250,
       height: 600,
@@ -104,9 +110,8 @@ app.on('ready', async () => {
     const x = screen.getPrimaryDisplay().workAreaSize.width;
 
     secondWindow.setPosition(x - 250, 0);
-    secondWindow.loadURL('file://' + __dirname + '/floatingPanel/floatingPanel.html');
+    secondWindow.loadURL('file://' + __dirname + '/floatingPanel.html');
 
-    clipboard.writeText('myPasswordPastedFromHandyPass')
   });
 
 
@@ -157,6 +162,10 @@ ipcMain.handle('updateEntries', async(e, data: any) => {
 ipcMain.handle('data', async(e, data: any) => {
   const properties: Properties = StorageService.loadProperties();
   return properties.entries;
+});
+
+ipcMain.handle('auth', async(e, data: any) => {
+  isAuthenticated = true;
 });
 
 

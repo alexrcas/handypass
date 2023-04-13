@@ -132,6 +132,7 @@ export default class App extends Vue {
     if (this.passwordInput == key) {
       this.logIn = false;
       this.authenticated = true;
+      (<any>window).ipcRenderer.invoke('auth', {});
     }
   }
 
@@ -140,6 +141,7 @@ export default class App extends Vue {
     await (<any>window).ipcRenderer.invoke('saveKey', key);
     this.signIn = false;
     this.authenticated = true;
+    (<any>window).ipcRenderer.invoke('auth', {});
   }
 
   async submit() {
